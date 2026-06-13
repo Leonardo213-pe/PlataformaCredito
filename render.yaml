@@ -1,9 +1,7 @@
 services:
   - type: web
     name: plataforma-credito
-    runtime: dotnet
-    buildCommand: dotnet publish -c Release -o out
-    startCommand: dotnet out/PlataformaCredito.dll
+    runtime: docker
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
