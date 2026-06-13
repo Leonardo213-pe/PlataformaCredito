@@ -3,37 +3,46 @@
     ViewData["Title"] = "Nueva Solicitud";
 }
 
-<h2>Nueva Solicitud de Crédito</h2>
+<div class="pc-page-header">
+    <div>
+        <h1 class="pc-page-title">Nueva Solicitud</h1>
+        <p class="pc-page-sub">Completa el formulario para registrar tu solicitud de crédito</p>
+    </div>
+</div>
 
 @if (!ViewData.ModelState.IsValid)
 {
-    <div class="alert alert-danger">
-        <ul class="mb-0">
-            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-            {
-                <li>@error.ErrorMessage</li>
-            }
-        </ul>
+    <div class="pc-alert pc-alert-danger">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <div>✕ @error.ErrorMessage</div>
+        }
     </div>
 }
 
-<form asp-action="Crear" method="post" style="max-width:400px;">
-    @Html.AntiForgeryToken()
+<div style="max-width:420px;">
+    <div class="pc-card">
+        <form asp-action="Crear" method="post">
+            @Html.AntiForgeryToken()
+            <div class="mb-4">
+                <label class="pc-form-label">Monto solicitado <span style="color:#dc2626;">*</span></label>
+                <div style="position:relative;">
+                    <span style="position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);color:#64748b;font-size:0.9rem;">$</span>
+                    <input asp-for="MontoSolicitado" type="number" min="0.01" step="100"
+                           class="pc-input" style="padding-left:1.75rem;"
+                           placeholder="0.00" />
+                </div>
+                <span asp-validation-for="MontoSolicitado" class="pc-form-error"></span>
+                <p class="pc-form-hint">El monto no puede superar 10 veces tus ingresos mensuales.</p>
+            </div>
 
-    <div class="mb-3">
-        <label asp-for="MontoSolicitado" class="form-label">Monto solicitado</label>
-        <div class="input-group">
-            <span class="input-group-text">$</span>
-            <input asp-for="MontoSolicitado" class="form-control" type="number" min="0.01" step="100" />
-        </div>
-        <span asp-validation-for="MontoSolicitado" class="text-danger small"></span>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn-pc btn-pc-primary">Enviar solicitud</button>
+                <a asp-action="Index" class="btn-pc btn-pc-ghost">Cancelar</a>
+            </div>
+        </form>
     </div>
-
-    <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-primary">Enviar solicitud</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
-    </div>
-</form>
+</div>
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }

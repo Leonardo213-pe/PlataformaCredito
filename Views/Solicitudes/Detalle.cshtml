@@ -1,34 +1,47 @@
 @model PlataformaCredito.Models.SolicitudCredito
 @{
-    ViewData["Title"] = "Detalle de Solicitud";
+    ViewData["Title"] = $"Solicitud #{Model.Id}";
+    var badgeClass = Model.Estado switch {
+        PlataformaCredito.Models.EstadoSolicitud.Aprobado  => "pc-badge-aprobado",
+        PlataformaCredito.Models.EstadoSolicitud.Rechazado => "pc-badge-rechazado",
+        _ => "pc-badge-pendiente"
+    };
 }
 
-<h2>Detalle de Solicitud #@Model.Id</h2>
-
-<div class="card mt-3" style="max-width:500px;">
-    <div class="card-body">
-        <dl class="row mb-0">
-            <dt class="col-sm-5">Monto solicitado</dt>
-            <dd class="col-sm-7">@Model.MontoSolicitado.ToString("C")</dd>
-
-            <dt class="col-sm-5">Fecha</dt>
-            <dd class="col-sm-7">@Model.FechaSolicitud.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd>
-
-            <dt class="col-sm-5">Estado</dt>
-            <dd class="col-sm-7">
-                <span class="badge @(Model.Estado == PlataformaCredito.Models.EstadoSolicitud.Pendiente ? "bg-warning text-dark" :
-                                     Model.Estado == PlataformaCredito.Models.EstadoSolicitud.Aprobado  ? "bg-success" : "bg-danger")">
-                    @Model.Estado
-                </span>
-            </dd>
-
-            @if (Model.Estado == PlataformaCredito.Models.EstadoSolicitud.Rechazado && Model.MotivoRechazo != null)
-            {
-                <dt class="col-sm-5">Motivo rechazo</dt>
-                <dd class="col-sm-7 text-danger">@Model.MotivoRechazo</dd>
-            }
-        </dl>
+<div class="pc-page-header">
+    <div>
+        <h1 class="pc-page-title">Solicitud #@Model.Id</h1>
+        <p class="pc-page-sub">Detalle completo de la solicitud</p>
     </div>
+    <span class="pc-badge @badgeClass" style="font-size:0.85rem;padding:0.4rem 1rem;">@Model.Estado</span>
 </div>
 
-<a asp-action="Index" class="btn btn-outline-secondary mt-3">← Volver</a>
+<div style="max-width:480px;">
+    <div class="pc-card">
+        <div class="pc-detail-row">
+            <span class="pc-detail-label">Monto solicitado</span>
+            <span class="pc-detail-value" style="font-size:1.1rem;color:#6366f1;font-weight:700;">
+                @Model.MontoSolicitado.ToString("C")
+            </span>
+        </div>
+        <div class="pc-detail-row">
+            <span class="pc-detail-label">Fecha de solicitud</span>
+            <span class="pc-detail-value">@Model.FechaSolicitud.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+        </div>
+        <div class="pc-detail-row">
+            <span class="pc-detail-label">Estado</span>
+            <span class="pc-badge @badgeClass">@Model.Estado</span>
+        </div>
+        @if (Model.Estado == PlataformaCredito.Models.EstadoSolicitud.Rechazado && !string.IsNullOrEmpty(Model.MotivoRechazo))
+        {
+            <div class="pc-detail-row">
+                <span class="pc-detail-label">Motivo de rechazo</span>
+                <span class="pc-detail-value" style="color:#dc2626;max-width:280px;text-align:right;">@Model.MotivoRechazo</span>
+            </div>
+        }
+    </div>
+
+    <div class="mt-3">
+        <a asp-action="Index" class="btn-pc btn-pc-ghost">← Volver a mis solicitudes</a>
+    </div>
+</div>

@@ -1,71 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - PlataformaCredito</title>
+    <title>@ViewData["Title"] — CréditoApp</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/PlataformaCredito.styles.css" asp-append-version="true" />
 </head>
 <body>
+    @{
+        var ultimaId    = Context.Session.GetInt32("UltimaSolicitudId");
+        var ultimaMonto = Context.Session.GetString("UltimaSolicitudMonto");
+    }
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">PlataformaCredito</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+        <nav class="navbar navbar-expand-sm pc-navbar">
+            <div class="container">
+                <a class="pc-brand" asp-controller="Home" asp-action="Index">
+                    <span class="pc-brand-dot"></span> CréditoApp
+                </a>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navMenu" aria-expanded="false">
+                    <span style="color:#94a3b8; font-size:1.2rem;">☰</span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    @{
-                        var ultimaId    = Context.Session.GetInt32("UltimaSolicitudId");
-                        var ultimaMonto = Context.Session.GetString("UltimaSolicitudMonto");
-                    }
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="collapse navbar-collapse" id="navMenu">
+                    <ul class="navbar-nav me-auto gap-1 mt-2 mt-sm-0">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
+                            <a class="pc-nav-link" asp-controller="Home" asp-action="Index">Inicio</a>
                         </li>
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Solicitudes" asp-action="Index">Mis Solicitudes</a>
+                                <a class="pc-nav-link" asp-controller="Solicitudes" asp-action="Index">Mis Solicitudes</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Solicitudes" asp-action="Crear">Nueva Solicitud</a>
+                                <a class="pc-nav-link" asp-controller="Solicitudes" asp-action="Crear">Nueva Solicitud</a>
                             </li>
                             if (User.IsInRole("Analista"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark fw-semibold" asp-controller="Analista" asp-action="Index">Panel Analista</a>
+                                    <a class="pc-nav-link pc-nav-analista" asp-controller="Analista" asp-action="Index">Panel Analista</a>
                                 </li>
                             }
                             if (ultimaId.HasValue && ultimaMonto != null)
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-info" asp-controller="Solicitudes" asp-action="Detalle" asp-route-id="@ultimaId">
-                                        Ver última solicitud @ultimaMonto
+                                    <a class="pc-nav-link pc-nav-ultima" asp-controller="Solicitudes" asp-action="Detalle" asp-route-id="@ultimaId">
+                                        ↩ Ver última · @ultimaMonto
                                     </a>
                                 </li>
                             }
                         }
                     </ul>
-                    <partial name="_LoginPartial" />
+                    <ul class="navbar-nav pc-nav-login gap-1">
+                        <partial name="_LoginPartial" />
+                    </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+    <div class="pc-container">
+        <main role="main">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="pc-footer">
         <div class="container">
-            &copy; 2026 - PlataformaCredito - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2026 CréditoApp
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

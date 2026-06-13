@@ -3,23 +3,28 @@
     ViewData["Title"] = "Mis Solicitudes";
 }
 
-<h2>Mis Solicitudes</h2>
+<div class="pc-page-header">
+    <div>
+        <h1 class="pc-page-title">Mis Solicitudes</h1>
+        <p class="pc-page-sub">Historial de tus solicitudes de crédito</p>
+    </div>
+    <a asp-action="Crear" class="btn-pc btn-pc-primary">+ Nueva solicitud</a>
+</div>
 
 @if (TempData["Exito"] != null)
 {
-    <div class="alert alert-success">@TempData["Exito"]</div>
+    <div class="pc-alert pc-alert-success">✓ @TempData["Exito"]</div>
 }
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <div class="pc-alert pc-alert-danger">✕ @TempData["Error"]</div>
 }
 
-@* Filtros *@
-<form method="get" asp-action="Index" class="mb-4 p-3 border rounded bg-light">
+<form method="get" asp-action="Index" class="pc-filter">
     <div class="row g-2 align-items-end">
-        <div class="col-md-2">
-            <label class="form-label">Estado</label>
-            <select name="Estado" class="form-select form-select-sm">
+        <div class="col-6 col-md-2">
+            <label>Estado</label>
+            <select name="Estado" class="pc-select">
                 <option value="">Todos</option>
                 @foreach (var e in Enum.GetValues<PlataformaCredito.Models.EstadoSolicitud>())
                 {
@@ -27,70 +32,75 @@
                 }
             </select>
         </div>
-        <div class="col-md-2">
-            <label class="form-label">Monto mín.</label>
-            <input type="number" name="MontoMin" value="@Model.MontoMin" class="form-control form-control-sm" min="0" step="100" />
+        <div class="col-6 col-md-2">
+            <label>Monto mín.</label>
+            <input type="number" name="MontoMin" value="@Model.MontoMin" class="pc-input" min="0" step="100" placeholder="0" />
         </div>
-        <div class="col-md-2">
-            <label class="form-label">Monto máx.</label>
-            <input type="number" name="MontoMax" value="@Model.MontoMax" class="form-control form-control-sm" min="0" step="100" />
+        <div class="col-6 col-md-2">
+            <label>Monto máx.</label>
+            <input type="number" name="MontoMax" value="@Model.MontoMax" class="pc-input" min="0" step="100" placeholder="∞" />
         </div>
-        <div class="col-md-2">
-            <label class="form-label">Fecha inicio</label>
-            <input type="date" name="FechaInicio" value="@Model.FechaInicio?.ToString("yyyy-MM-dd")" class="form-control form-control-sm" />
+        <div class="col-6 col-md-2">
+            <label>Desde</label>
+            <input type="date" name="FechaInicio" value="@Model.FechaInicio?.ToString("yyyy-MM-dd")" class="pc-input" />
         </div>
-        <div class="col-md-2">
-            <label class="form-label">Fecha fin</label>
-            <input type="date" name="FechaFin" value="@Model.FechaFin?.ToString("yyyy-MM-dd")" class="form-control form-control-sm" />
+        <div class="col-6 col-md-2">
+            <label>Hasta</label>
+            <input type="date" name="FechaFin" value="@Model.FechaFin?.ToString("yyyy-MM-dd")" class="pc-input" />
         </div>
-        <div class="col-md-2 d-flex gap-2">
-            <button type="submit" class="btn btn-primary btn-sm w-100">Filtrar</button>
-            <a asp-action="Index" class="btn btn-outline-secondary btn-sm w-100">Limpiar</a>
+        <div class="col-6 col-md-2 d-flex gap-2">
+            <button type="submit" class="btn-pc btn-pc-primary w-100">Filtrar</button>
+            <a asp-action="Index" class="btn-pc btn-pc-ghost w-100">✕</a>
         </div>
     </div>
 </form>
 
-@* Error de validación server-side *@
 @if (Model.ErrorFiltro != null)
 {
-    <div class="alert alert-danger">@Model.ErrorFiltro</div>
+    <div class="pc-alert pc-alert-danger">@Model.ErrorFiltro</div>
 }
 
-@* Tabla de resultados *@
 @if (!Model.Solicitudes.Any())
 {
-    <p class="text-muted">No se encontraron solicitudes.</p>
+    <div class="pc-empty">
+        <div class="pc-empty-icon">📭</div>
+        <p>No se encontraron solicitudes.</p>
+    </div>
 }
 else
 {
-    <table class="table table-hover table-bordered">
-        <thead class="table-light">
-            <tr>
-                <th>#</th>
-                <th>Monto solicitado</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var s in Model.Solicitudes)
-            {
+    <div class="pc-table-wrap">
+        <table class="pc-table">
+            <thead>
                 <tr>
-                    <td>@s.Id</td>
-                    <td>@s.MontoSolicitado.ToString("C")</td>
-                    <td>@s.FechaSolicitud.ToLocalTime().ToString("dd/MM/yyyy")</td>
-                    <td>
-                        <span class="badge @(s.Estado == PlataformaCredito.Models.EstadoSolicitud.Pendiente ? "bg-warning text-dark" :
-                                             s.Estado == PlataformaCredito.Models.EstadoSolicitud.Aprobado  ? "bg-success" : "bg-danger")">
-                            @s.Estado
-                        </span>
-                    </td>
-                    <td>
-                        <a asp-action="Detalle" asp-route-id="@s.Id" class="btn btn-sm btn-outline-primary">Ver detalle</a>
-                    </td>
+                    <th>#</th>
+                    <th>Monto solicitado</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th></th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var s in Model.Solicitudes)
+                {
+                    var badgeClass = s.Estado switch {
+                        PlataformaCredito.Models.EstadoSolicitud.Aprobado  => "pc-badge-aprobado",
+                        PlataformaCredito.Models.EstadoSolicitud.Rechazado => "pc-badge-rechazado",
+                        _ => "pc-badge-pendiente"
+                    };
+                    <tr>
+                        <td class="pc-muted">@s.Id</td>
+                        <td><strong>@s.MontoSolicitado.ToString("C")</strong></td>
+                        <td class="pc-muted">@s.FechaSolicitud.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                        <td><span class="pc-badge @badgeClass">@s.Estado</span></td>
+                        <td>
+                            <a asp-action="Detalle" asp-route-id="@s.Id" class="btn-pc btn-pc-ghost" style="padding:0.3rem 0.8rem;font-size:0.8rem;">
+                                Ver →
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }

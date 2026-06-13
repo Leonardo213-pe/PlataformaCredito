@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: plataforma-credito
+    runtime: dotnet
+    buildCommand: dotnet publish -c Release -o out
+    startCommand: dotnet out/PlataformaCredito.dll
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        value: DataSource=app.db;Cache=Shared
+      - key: Redis__ConnectionString
+        sync: false
