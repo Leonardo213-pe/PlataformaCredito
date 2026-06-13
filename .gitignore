@@ -1,0 +1,12 @@
+bin/
+obj/
+*.user
+*.suo
+.vs/
+app.db
+app.db-shm
+app.db-wal
+publish/
+*.pubxml
+.DS_Store
+Thumbs.db
