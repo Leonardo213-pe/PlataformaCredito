@@ -81,6 +81,74 @@ public class SolicitudesController : Controller
         return View(filtro);
     }
 
+    // GET: /Solicitudes/Crear
+    public async Task<IActionResult> Crear()
+    {
+        var userId = _userManager.GetUserId(User);
+        var cliente = await _db.Clientes.FirstOrDefaultAsync(c => c.UsuarioId == userId);
+
+        if (cliente == null || !cliente.Activo)
+        {
+            TempData["Error"] = "No tienes un perfil de cliente activo.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        return View(new CrearSolicitudViewModel());
+    }
+
+    // POST: /Solicitudes/Crear
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Crear(CrearSolicitudViewModel vm)
+    {
+        if (!ModelState.IsValid)
+            return View(vm);
+
+        var userId = _userManager.GetUserId(User);
+        var cliente = await _db.Clientes
+            .Include(c => c.Solicitudes)
+            .FirstOrDefaultAsync(c => c.UsuarioId == userId);
+
+        // Validación: cliente activo
+        if (cliente == null || !cliente.Activo)
+        {
+            ModelState.AddModelError("", "No tienes un perfil de cliente activo.");
+            return View(vm);
+        }
+
+        // Validación: no más de una solicitud Pendiente
+        var tienePendiente = cliente.Solicitudes
+            .Any(s => s.Estado == EstadoSolicitud.Pendiente);
+
+        if (tienePendiente)
+        {
+            ModelState.AddModelError("", "Ya tienes una solicitud en estado Pendiente. Espera a que sea procesada.");
+            return View(vm);
+        }
+
+        // Validación: monto no supera 10x ingresos
+        if (vm.MontoSolicitado > cliente.IngresosMensuales * 10)
+        {
+            ModelState.AddModelError("MontoSolicitado",
+                $"El monto no puede superar 10 veces tus ingresos mensuales (máx. {(cliente.IngresosMensuales * 10):C}).");
+            return View(vm);
+        }
+
+        var solicitud = new SolicitudCredito
+        {
+            ClienteId = cliente.Id,
+            MontoSolicitado = vm.MontoSolicitado,
+            FechaSolicitud = DateTime.UtcNow,
+            Estado = EstadoSolicitud.Pendiente
+        };
+
+        _db.SolicitudesCredito.Add(solicitud);
+        await _db.SaveChangesAsync();
+
+        TempData["Exito"] = $"Solicitud por {vm.MontoSolicitado:C} registrada exitosamente.";
+        return RedirectToAction(nameof(Index));
+    }
+
     // GET: /Solicitudes/Detalle/5
     public async Task<IActionResult> Detalle(int id)
     {
