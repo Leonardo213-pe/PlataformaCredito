@@ -1,0 +1,42 @@
+@model PlataformaCredito.Models.SolicitudCredito
+@{
+    ViewData["Title"] = "Rechazar Solicitud";
+}
+
+<h2>Rechazar Solicitud #@Model.Id</h2>
+
+<div class="card mb-3" style="max-width:480px;">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-5">Cliente</dt>
+            <dd class="col-sm-7">@Model.Cliente?.Usuario?.Email</dd>
+            <dt class="col-sm-5">Monto solicitado</dt>
+            <dd class="col-sm-7">@Model.MontoSolicitado.ToString("C")</dd>
+            <dt class="col-sm-5">Fecha</dt>
+            <dd class="col-sm-7">@Model.FechaSolicitud.ToLocalTime().ToString("dd/MM/yyyy")</dd>
+        </dl>
+    </div>
+</div>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <div>@e.ErrorMessage</div>
+        }
+    </div>
+}
+
+<form asp-action="Rechazar" asp-route-id="@Model.Id" method="post" style="max-width:480px;">
+    @Html.AntiForgeryToken()
+    <div class="mb-3">
+        <label for="motivoRechazo" class="form-label fw-semibold">Motivo de rechazo <span class="text-danger">*</span></label>
+        <textarea id="motivoRechazo" name="motivoRechazo" class="form-control" rows="3"
+                  placeholder="Describe el motivo del rechazo..." required maxlength="500"></textarea>
+    </div>
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-danger">Confirmar rechazo</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+</form>

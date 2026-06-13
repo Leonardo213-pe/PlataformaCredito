@@ -1,0 +1,68 @@
+@model List<PlataformaCredito.Models.SolicitudCredito>
+@{
+    ViewData["Title"] = "Panel Analista";
+}
+
+<h2>Panel de Analista</h2>
+<p class="text-muted">Solicitudes pendientes de evaluación</p>
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success">@TempData["Exito"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No hay solicitudes pendientes.</div>
+}
+else
+{
+    <table class="table table-hover table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>#</th>
+                <th>Cliente</th>
+                <th>Ingresos mensuales</th>
+                <th>Monto solicitado</th>
+                <th>Fecha</th>
+                <th>Límite aprobable</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model)
+            {
+                var limiteAprobable = s.Cliente!.IngresosMensuales * 5;
+                var excedeLimite = s.MontoSolicitado > limiteAprobable;
+                <tr class="@(excedeLimite ? "table-warning" : "")">
+                    <td>@s.Id</td>
+                    <td>@(s.Cliente?.Usuario?.Email ?? "—")</td>
+                    <td>@s.Cliente!.IngresosMensuales.ToString("C")</td>
+                    <td>@s.MontoSolicitado.ToString("C")</td>
+                    <td>@s.FechaSolicitud.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                    <td>
+                        @limiteAprobable.ToString("C")
+                        @if (excedeLimite)
+                        {
+                            <span class="badge bg-warning text-dark ms-1">Excede límite</span>
+                        }
+                    </td>
+                    <td class="d-flex gap-2">
+                        @if (!excedeLimite)
+                        {
+                            <form asp-action="Aprobar" asp-route-id="@s.Id" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-success">Aprobar</button>
+                            </form>
+                        }
+                        <a asp-action="Rechazar" asp-route-id="@s.Id" class="btn btn-sm btn-outline-danger">Rechazar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
