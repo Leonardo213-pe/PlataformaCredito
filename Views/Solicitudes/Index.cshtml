@@ -5,6 +5,15 @@
 
 <h2>Mis Solicitudes</h2>
 
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success">@TempData["Exito"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
 @* Filtros *@
 <form method="get" asp-action="Index" class="mb-4 p-3 border rounded bg-light">
     <div class="row g-2 align-items-end">
