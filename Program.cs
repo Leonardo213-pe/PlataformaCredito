@@ -5,6 +5,11 @@ using PlataformaCredito.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Render.com inyecta PORT; escuchar en 0.0.0.0 para que sea accesible
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 

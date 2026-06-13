@@ -3,66 +3,81 @@
     ViewData["Title"] = "Panel Analista";
 }
 
-<h2>Panel de Analista</h2>
-<p class="text-muted">Solicitudes pendientes de evaluación</p>
+<div class="pc-page-header">
+    <div>
+        <h1 class="pc-page-title">Panel de Analista</h1>
+        <p class="pc-page-sub">Solicitudes pendientes de evaluación — @Model.Count en cola</p>
+    </div>
+</div>
 
 @if (TempData["Exito"] != null)
 {
-    <div class="alert alert-success">@TempData["Exito"]</div>
+    <div class="pc-alert pc-alert-success">✓ @TempData["Exito"]</div>
 }
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <div class="pc-alert pc-alert-danger">✕ @TempData["Error"]</div>
 }
 
 @if (!Model.Any())
 {
-    <div class="alert alert-info">No hay solicitudes pendientes.</div>
+    <div class="pc-empty">
+        <div class="pc-empty-icon">✅</div>
+        <p>No hay solicitudes pendientes.</p>
+    </div>
 }
 else
 {
-    <table class="table table-hover table-bordered">
-        <thead class="table-light">
-            <tr>
-                <th>#</th>
-                <th>Cliente</th>
-                <th>Ingresos mensuales</th>
-                <th>Monto solicitado</th>
-                <th>Fecha</th>
-                <th>Límite aprobable</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var s in Model)
-            {
-                var limiteAprobable = s.Cliente!.IngresosMensuales * 5;
-                var excedeLimite = s.MontoSolicitado > limiteAprobable;
-                <tr class="@(excedeLimite ? "table-warning" : "")">
-                    <td>@s.Id</td>
-                    <td>@(s.Cliente?.Usuario?.Email ?? "—")</td>
-                    <td>@s.Cliente!.IngresosMensuales.ToString("C")</td>
-                    <td>@s.MontoSolicitado.ToString("C")</td>
-                    <td>@s.FechaSolicitud.ToLocalTime().ToString("dd/MM/yyyy")</td>
-                    <td>
-                        @limiteAprobable.ToString("C")
-                        @if (excedeLimite)
-                        {
-                            <span class="badge bg-warning text-dark ms-1">Excede límite</span>
-                        }
-                    </td>
-                    <td class="d-flex gap-2">
-                        @if (!excedeLimite)
-                        {
-                            <form asp-action="Aprobar" asp-route-id="@s.Id" method="post">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-sm btn-success">Aprobar</button>
-                            </form>
-                        }
-                        <a asp-action="Rechazar" asp-route-id="@s.Id" class="btn btn-sm btn-outline-danger">Rechazar</a>
-                    </td>
+    <div class="pc-table-wrap">
+        <table class="pc-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Cliente</th>
+                    <th>Ingresos</th>
+                    <th>Monto</th>
+                    <th>Límite (5×)</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var s in Model)
+                {
+                    var limite = s.Cliente!.IngresosMensuales * 5;
+                    var excede = s.MontoSolicitado > limite;
+                    <tr class="@(excede ? "row-warning" : "")">
+                        <td class="pc-muted">@s.Id</td>
+                        <td>@(s.Cliente?.Usuario?.Email ?? "—")</td>
+                        <td>@s.Cliente!.IngresosMensuales.ToString("C")</td>
+                        <td><strong>@s.MontoSolicitado.ToString("C")</strong></td>
+                        <td>
+                            @limite.ToString("C")
+                            @if (excede)
+                            {
+                                <span class="pc-badge pc-badge-rechazado ms-1" style="font-size:0.7rem;">Excede</span>
+                            }
+                        </td>
+                        <td class="pc-muted">@s.FechaSolicitud.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                @if (!excede)
+                                {
+                                    <form asp-action="Aprobar" asp-route-id="@s.Id" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn-pc btn-pc-success" style="padding:0.35rem 0.9rem;font-size:0.8rem;">
+                                            Aprobar
+                                        </button>
+                                    </form>
+                                }
+                                <a asp-action="Rechazar" asp-route-id="@s.Id" class="btn-pc btn-pc-danger" style="padding:0.35rem 0.9rem;font-size:0.8rem;">
+                                    Rechazar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }

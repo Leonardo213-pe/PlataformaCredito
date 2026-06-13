@@ -1,42 +1,55 @@
 @model PlataformaCredito.Models.SolicitudCredito
 @{
-    ViewData["Title"] = "Rechazar Solicitud";
+    ViewData["Title"] = $"Rechazar Solicitud #{Model.Id}";
 }
 
-<h2>Rechazar Solicitud #@Model.Id</h2>
-
-<div class="card mb-3" style="max-width:480px;">
-    <div class="card-body">
-        <dl class="row mb-0">
-            <dt class="col-sm-5">Cliente</dt>
-            <dd class="col-sm-7">@Model.Cliente?.Usuario?.Email</dd>
-            <dt class="col-sm-5">Monto solicitado</dt>
-            <dd class="col-sm-7">@Model.MontoSolicitado.ToString("C")</dd>
-            <dt class="col-sm-5">Fecha</dt>
-            <dd class="col-sm-7">@Model.FechaSolicitud.ToLocalTime().ToString("dd/MM/yyyy")</dd>
-        </dl>
+<div class="pc-page-header">
+    <div>
+        <h1 class="pc-page-title">Rechazar Solicitud #@Model.Id</h1>
+        <p class="pc-page-sub">Registra el motivo antes de confirmar el rechazo</p>
     </div>
+    <span class="pc-badge pc-badge-pendiente">Pendiente</span>
 </div>
 
-@if (!ViewData.ModelState.IsValid)
-{
-    <div class="alert alert-danger">
-        @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-        {
-            <div>@e.ErrorMessage</div>
-        }
+<div style="max-width:480px;">
+    <div class="pc-card mb-3">
+        <div class="pc-detail-row">
+            <span class="pc-detail-label">Cliente</span>
+            <span class="pc-detail-value">@Model.Cliente?.Usuario?.Email</span>
+        </div>
+        <div class="pc-detail-row">
+            <span class="pc-detail-label">Monto solicitado</span>
+            <span class="pc-detail-value" style="color:#6366f1;font-weight:700;">@Model.MontoSolicitado.ToString("C")</span>
+        </div>
+        <div class="pc-detail-row">
+            <span class="pc-detail-label">Fecha</span>
+            <span class="pc-detail-value">@Model.FechaSolicitud.ToLocalTime().ToString("dd/MM/yyyy")</span>
+        </div>
     </div>
-}
 
-<form asp-action="Rechazar" asp-route-id="@Model.Id" method="post" style="max-width:480px;">
-    @Html.AntiForgeryToken()
-    <div class="mb-3">
-        <label for="motivoRechazo" class="form-label fw-semibold">Motivo de rechazo <span class="text-danger">*</span></label>
-        <textarea id="motivoRechazo" name="motivoRechazo" class="form-control" rows="3"
-                  placeholder="Describe el motivo del rechazo..." required maxlength="500"></textarea>
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="pc-alert pc-alert-danger">
+            @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <div>✕ @e.ErrorMessage</div>
+            }
+        </div>
+    }
+
+    <div class="pc-card">
+        <form asp-action="Rechazar" asp-route-id="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+            <div class="mb-4">
+                <label class="pc-form-label">Motivo de rechazo <span style="color:#dc2626;">*</span></label>
+                <textarea id="motivoRechazo" name="motivoRechazo" class="pc-textarea" rows="4"
+                          placeholder="Describe el motivo del rechazo..." required maxlength="500"></textarea>
+                <p class="pc-form-hint">Máximo 500 caracteres. El cliente verá este mensaje.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn-pc btn-pc-danger">Confirmar rechazo</button>
+                <a asp-action="Index" class="btn-pc btn-pc-ghost">Cancelar</a>
+            </div>
+        </form>
     </div>
-    <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-danger">Confirmar rechazo</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
-    </div>
-</form>
+</div>

@@ -1,8 +1,46 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="pc-hero">
+    <div class="pc-hero-tag">Plataforma Financiera Interna</div>
+    <h1>Gestión de créditos<br><span>simple y segura</span></h1>
+    <p>Registra, evalúa y aprueba solicitudes de crédito con reglas de negocio automáticas.</p>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <a asp-controller="Solicitudes" asp-action="Index" class="btn-pc btn-pc-primary me-2">Ver mis solicitudes</a>
+        <a asp-controller="Solicitudes" asp-action="Crear" class="btn-pc btn-pc-secondary">Nueva solicitud</a>
+    }
+    else
+    {
+        <a asp-area="Identity" asp-page="/Account/Login" class="btn-pc btn-pc-primary me-2">Iniciar sesión</a>
+        <a asp-area="Identity" asp-page="/Account/Register" class="btn-pc btn-pc-secondary">Registrarse</a>
+    }
+</div>
+
+<hr class="pc-divider">
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="pc-feature-card">
+            <div class="pc-feature-icon pc-feature-icon-purple">⚡</div>
+            <div class="pc-feature-title">Evaluación automática</div>
+            <p class="pc-feature-desc">Reglas de negocio al instante: límites de monto, ingresos y solicitudes activas.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="pc-feature-card">
+            <div class="pc-feature-icon pc-feature-icon-blue">🛡️</div>
+            <div class="pc-feature-title">Panel de analistas</div>
+            <p class="pc-feature-desc">Aprueba o rechaza solicitudes con trazabilidad. Solo accesible para analistas.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="pc-feature-card">
+            <div class="pc-feature-icon pc-feature-icon-green">📋</div>
+            <div class="pc-feature-title">Historial completo</div>
+            <p class="pc-feature-desc">Filtra por estado, monto y fechas. Detalle completo de cada solicitud.</p>
+        </div>
+    </div>
 </div>
