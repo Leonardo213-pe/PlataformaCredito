@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -18,6 +18,10 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    @{
+                        var ultimaId    = Context.Session.GetInt32("UltimaSolicitudId");
+                        var ultimaMonto = Context.Session.GetString("UltimaSolicitudMonto");
+                    }
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
@@ -30,6 +34,14 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Solicitudes" asp-action="Crear">Nueva Solicitud</a>
                             </li>
+                            if (ultimaId.HasValue && ultimaMonto != null)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-info" asp-controller="Solicitudes" asp-action="Detalle" asp-route-id="@ultimaId">
+                                        Ver última solicitud @ultimaMonto
+                                    </a>
+                                </li>
+                            }
                         }
                     </ul>
                     <partial name="_LoginPartial" />
