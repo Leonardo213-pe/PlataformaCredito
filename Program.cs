@@ -19,6 +19,11 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.AccessDeniedPath = "/AccesoDenegado";
+});
+
 // Redis: cache distribuido + sesión
 var redisConn = builder.Configuration["Redis:ConnectionString"];
 if (!string.IsNullOrEmpty(redisConn))
@@ -69,6 +74,9 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
+app.MapGet("/AccesoDenegado", () => Results.Content(
+    "<!DOCTYPE html><html><body><h2>Acceso denegado</h2><p>No tienes permiso para acceder a esta sección.</p><a href='/'>Volver al inicio</a></body></html>",
+    "text/html"));
 
 using (var scope = app.Services.CreateScope())
     await DbSeeder.SeedAsync(scope.ServiceProvider);
